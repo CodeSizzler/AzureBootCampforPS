@@ -1,10 +1,10 @@
 ---
 lab:
-    az204Title: 'Lab 03: Retrieve Azure Storage resources and metadata by using the Azure Storage SDK for .NET'
+    az204Title: 'Lab: Retrieve Azure Storage resources and metadata by using the Azure Storage SDK for .NET'
     az204Module: 'Learning Path 03: Develop solutions that use blob storage'
 ---
 
-# Lab 03: Retrieve Azure Storage resources and metadata by using the Azure Storage SDK for .NET
+# Lab: Retrieve Azure Storage resources and metadata by using the Azure Storage SDK for .NET
 
 ## Microsoft Azure user interface
 
