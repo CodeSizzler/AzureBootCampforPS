@@ -1,10 +1,10 @@
 ---
 lab:
-    az204Title: 'Lab 05: Deploy compute workloads by using images and containers'
-    az204Module: 'Learning Path 05: Implement containerized solutions'
+    Title: 'Lab: Deploy compute workloads by using images and containers using .NET'
+    Module: 'Learning Path: Implement containerized solutions'
 ---
 
-# Lab 05: Deploy compute workloads by using images and containers
+# Lab: Deploy compute workloads by using images and containers using .NET
 
 ## Microsoft Azure user interface
 
