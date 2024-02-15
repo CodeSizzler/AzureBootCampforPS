@@ -1,7 +1,7 @@
 ---
 lab:
-  az204Title: "Lab 05: Construct a polyglot data solution"
-  az204Module: "Learning Path 05: Develop solutions using .NET that use Cosmos DB storage"
+  Title: "Lab 04: Construct a polyglot data solution"
+  Module: "Learning Path 04: Develop solutions using .NET that use Cosmos DB storage"
 ---
 
 # Lab: Develop solutions using .NET that use Cosmos DB storage
