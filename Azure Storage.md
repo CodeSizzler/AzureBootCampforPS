@@ -5,7 +5,7 @@ demo:
 ---
 
 
-# 07 - Administer Azure Storage
+# Administer Azure Storage
 
 ## Configure Storage Accounts
 
