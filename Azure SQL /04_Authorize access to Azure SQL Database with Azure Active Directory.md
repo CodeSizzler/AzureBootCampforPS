@@ -1,7 +1,7 @@
 ---
 lab:
     title: 'Authorize access to Azure SQL Database with Azure Active Directory'
-    module: 'Implement a Secure Environment for a Database Service'
+    module: 'Azure SQL Database'
 ---
 
 # Configure database authentication and authorization
