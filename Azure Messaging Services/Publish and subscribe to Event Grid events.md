@@ -1,0 +1,361 @@
+---
+lab:
+    Title: 'Lab: Publish and subscribe to Event Grid events'
+    Learning Path: 'Azure Messaging Solutions'
+---
+
+# Lab: Publish and subscribe to Event Grid events
+
+## Microsoft Azure user interface
+
+Given the dynamic nature of Microsoft cloud tools, you might experience Azure UI changes that occur after the development of this training content. As a result, the lab instructions and lab steps might not align correctly.
+
+Microsoft updates this training course when the community alerts us to needed changes. However, cloud updates occur frequently, so you might encounter UI changes before this training content updates. **If this occurs, adapt to the changes, and then work through them in the labs as needed.**
+
+## Instructions
+
+#### Review the installed applications
+
+- Microsoft Edge
+- Microsoft Visual Studio Code
+
+## Lab Scenario
+
+In this lab, you will start with a proof-of-concept web app, hosted in a container, that will be used to subscribe to your Event Grid. This app will allow you to submit events and receive confirmation messages that the events were successful.
+
+### Exercise 1: Create Azure resources
+
+#### Task 1: Open the Azure portal
+
+1. On the taskbar, select the **Microsoft Edge** icon.
+
+1. In the open browser window, browse to the Azure portal at `https://portal.azure.com`, and then sign in with the account you'll be using for this lab.
+
+    > **Note**: If this is your first time signing in to the Azure portal, you'll be offered a tour of the portal. Select **Get Started** to skip the tour and begin using the portal.
+
+#### Task 2: Open Azure Cloud Shell
+
+1. In the Azure portal, select the **Cloud Shell** icon to open a new Bash session. If Cloud Shell defaults to a PowerShell session, select **PowerShell** and, in the drop-down menu, select **Bash**.
+
+    > **Note**: If this is the first time you are starting **Cloud Shell**, when prompted to select either **Bash** or **PowerShell**, select **Bash**. When you are presented with the **You have no storage mounted** message, select the subscription you are using in this lab, and then select **Create storage**.
+
+1. In Azure portal, at the **Cloud Shell** command prompt, run the following command to get the version of the Azure Command-Line Interface (Azure CLI) tool:
+
+    ```bash
+    az --version
+    ```
+
+#### Task 3: Review the Microsoft.EventGrid provider registration
+
+1. In the **Cloud Shell pane**, run the following command to check if the resource provider "Microsoft.EventGrid" has been registered :
+
+    ```bash
+    az provider show --namespace Microsoft.EventGrid --query "registrationState"
+    ```
+
+1. Notice that the **Microsoft.EventGrid** provider has been registered.
+
+1. Close the **Cloud Shell** pane.
+
+#### Task 4: Create a custom Event Grid topic
+
+1. On the Azure portal's navigation pane, select **Create a resource**.
+
+1. On the **Create a resource** blade, in the **Search services and marketplace** text box, enter **Event Grid Topic**, and then select Enter.
+
+1. On the **Marketplace** search results blade, select the **Event Grid Topic** result, and then select **Create**.
+
+1. On the **Create Topic** blade, on the **Basics** tab, perform the following actions, and then select the **Advanced** tab:
+
+    | Setting | Action |
+    | -- | -- |
+    | **Subscription** drop-down list  | Retain the default value |
+    | **Resource group** drop-down list | Select **Create new**, enter **PubSubEvents**, and then select **OK** |
+    | **Name** text box | Enter **hrtopic**_[yourname]_ |
+    | **Region** drop-down list | Select **East US** |
+
+
+1. On the **Advanced** tab, from the **Event Schema** drop-down list, ensure that the **Event Grid Schema** entry is selected, and then select **Review + create**.
+
+1. On the **Review + create** tab, review the options that you selected during the previous steps.
+
+1. Select **Create** to create the event grid topic by using your specified configuration.
+  
+    > **Note**: Wait for Azure to finish creating the topic before you continue with the lab. You'll receive a notification when the topic is created.
+
+#### Task 5: Deploy the Azure Event Grid viewer to a web app
+
+1. On the Azure portal's navigation pane, select **Create a resource**.
+
+1. On the **Create a resource** blade, in the **Search services and marketplace** text box, enter **Web App**, and then select Enter.
+
+1. On the **Marketplace** search results blade, select the **Web App** result, and then select **Create**.
+
+1. On the **Create Web App** blade, on the **Basics** tab, perform the following actions, and then select **Next: Docker**:
+
+   | Setting | Action |
+   | -- | -- |
+   | **Subscription** drop-down list | Retain the default value |
+   | **Resource group** drop-down list | Select **PubSubEvents** in the list |
+   | **Name** text box | Enter **eventviewer**_[yourname]_ |
+   | **Publish** section | Select **Docker Container** |
+   | **Operating System** section | Select **Linux** |
+   | **Region** drop-down list | Select **East US** |
+   | **Linux Plan (East US)** section | Select **Create new**, in the **Name** text box, enter **EventPlan**, and then select **OK** |
+   | **Pricing plan** section | Retain the default value |
+
+
+
+1. On the **Docker** tab, perform the following actions, and select **Review + create**:
+
+    | Setting | Action |
+    | -- | -- |
+    | **Options** drop-down list | Select **Single Container** |
+    | **Image Source** drop-down list | Select **Docker Hub** |
+    | **Access Type** drop-down list | Select **Public** |
+    | **Image and tag** text box | Enter **microsoftlearning/azure-event-grid-viewer:latest** |
+
+   
+1. On the **Review + create** tab, review the options that you selected during the previous steps.
+
+1. Select **Create** to create the web app using your specified configuration.
+  
+    > **Note**: Wait for Azure to finish creating the web app before you continue with the lab. You'll receive a notification when the app is created.
+
+#### Review
+
+In this exercise, you created the Event Grid topic and a web app that you will use throughout the remainder of the lab.
+
+### Exercise 2: Create an Event Grid subscription
+
+#### Task 1: Access the Event Grid Viewer web application
+
+1. On the Azure portal's navigation pane, select **Resource groups**.
+
+1. On the **Resource groups** blade, select the **PubSubEvents** resource group.
+
+1. On the **PubSubEvents** blade, select the **eventviewer**_[yourname]_ web app, you will see the **Overview** section.
+
+1. In the **Overview** section, record the value of the **Default domain** under the essentials pane. You'll use this value later in the lab.
+
+1. Click the **Browse** button while you're still in the **Overview** section.
+
+1. Observe the currently running **Azure Event Grid Viewer** web application. Leave this web application running for the remainder of the lab.
+
+    > **Note**: This web application will update in real time as events are sent to its endpoint. You'll use this application to monitor events throughout the lab.
+
+1. Return to your currently open browser window that displays the Azure portal.
+
+#### Task 2: Create a new subscription
+
+1. On the Azure portal's navigation pane, select **Resource groups**.
+
+1. On the **Resource groups** blade, select the **PubSubEvents** resource group that you created previously in this lab.
+
+1. On the **PubSubEvents** blade, select the **hrtopic**_[yourname]_ Event Grid topic that you created previously in this lab.
+
+1. On the **Event Grid Topic** blade, select **+ Event Subscription**.
+
+1. On the **Create Event Subscription** blade, perform the following actions, and then select **Create**:
+
+    | Setting | Action |
+    | -- | -- |
+    | **Name** text box | Enter **basicsub** |
+    | **Event Schema** drop-down list | Select **Event Grid Schema** |
+    | **Endpoint Type** drop-down list | Select **Web Hook** |
+    | **Endpoint** | Select **Configure an endpoint**. In the **Subscriber Endpoint** text box, enter the **Web App URL** value that you recorded previously, ensure that it uses an **https://** prefix, add the suffix **/api/updates**, and then select **Confirm Selection**. For example, if your **Web App URL** value is ``http://eventviewerstudent.azurewebsites.net/``, then your **Subscriber Endpoint** would be ``https://eventviewerstudent.azurewebsites.net/api/updates`` |
+
+   
+    > **Note**: Wait for Azure to finish creating the subscription before you continue with the lab. You'll receive a notification when the subscription is created.
+
+#### Task 3: Observe the subscription validation event
+
+1. Return to the browser window displaying the **Azure Event Grid Viewer** web application.
+
+1. Review the **Microsoft.EventGrid.SubscriptionValidationEvent** event that was created as part of the subscription creation process.
+
+1. Select the event and review its JSON content.
+
+1. Return to your currently open browser window with the Azure portal.
+
+#### Task 4: Record subscription credentials
+
+1. On the Azure portal's navigation pane, select **Resource groups**.
+
+1. On the **Resource groups** blade, select the **PubSubEvents** resource group that you created previously in this lab.
+
+1. On the **PubSubEvents** blade, select the **hrtopic**_[yourname]_ Event Grid topic that you created previously in this lab.
+
+1. On the **Event Grid Topic** blade, record the value of the **Topic Endpoint** field. You'll use this value later in the lab.
+
+1. In the **Settings** category, select the **Access keys** link.
+
+1. In the **Access keys** section, record the value of the **Key 1** text box. You'll use this value later in the lab.
+
+#### Review
+
+In this exercise, you created a new subscription, validated its registration, and then recorded the credentials required to publish a new event to the topic.
+
+### Exercise 3: Publish Event Grid events from .NET
+
+#### Task 1: Create a .NET project
+
+1. On the **Start** screen, select the **Visual Studio Code** tile.
+
+1. On the **File** menu, select **Open Folder**.
+
+1. In the **File Explorer** window that opens, browse to **Allfiles (F):\\Allfiles\\Labs\\09\\Starter\\EventPublisher**, and then select **Select Folder**.
+
+1. In the **Visual Studio Code** window, from its top menu bar, go to **Terminal** menu and select **New Terminal**.
+
+1. Run the following command to create a new .NET project named **EventPublisher** in the current folder:
+
+    ```powershell
+    dotnet new console --framework net8.0 --name EventPublisher --output . 
+    ```
+
+    > **Note**: The **dotnet new** command will create a new **console** project in a folder with the same name as the project.
+
+1. Run the following command to import version 4.11.0 of **Azure.Messaging.EventGrid** from NuGet:
+
+    ```powershell
+    dotnet add package Azure.Messaging.EventGrid --version 4.11.0
+    ```
+    
+
+    > **Note**: The **dotnet add package** command will add the **Microsoft.Azure.EventGrid** package from NuGet. For more information, go to [Azure.Messaging.EventGrid](https://www.nuget.org/packages/Azure.Messaging.EventGrid/4.11.0).
+
+
+1. Run the following command to build the .NET web application:
+
+    ```powershell
+    dotnet build
+    ```
+
+1. Select **Kill Terminal** or the **Recycle Bin** icon to close the currently open terminal and any associated processes.
+
+#### Task 2: Modify the Program class to connect to Event Grid
+
+1. On the **Explorer** pane of the **Visual Studio Code** window, open the **Program.cs** file.
+
+1. On the code editor tab for the **Program.cs** file, delete all the code in the existing file.
+  
+1. Add the following of code:
+
+    ```csharp
+    using Azure;
+    using Azure.Messaging.EventGrid;
+    using System;
+    using System.Threading.Tasks;    
+    public class Program
+    {
+        private const string topicEndpoint = "<topic-endpoint>";
+        /* Update the topicEndpoint string constant by setting its value to the Topic
+           Endpoint of the Event Grid topic that you recorded previously in this lab. */
+        private const string topicKey = "<topic-key>";   
+        /* Update the topicKey string constant by setting its value to the Key of the Event Grid topic that you recorded previously in this lab. */     
+        public static async Task Main(string[] args)
+        {
+            //Add Main code here
+        }
+    }
+    ```
+1. In line 7, replace the `<topic-endpoint>` placeholder with the value of the Event Grid topic endpoint you recorded earlier in this lab.
+
+1. In line 10, replace the `<topic-key>` placeholder with the value of the Event Grid topic access key you recorded earlier in this lab.
+
+#### Task 3: Publish new events
+
+1. Add the following code in the **Main** method of **Program.cs** file:
+   
+    ```csharp
+    public static async Task Main(string[] args)
+    {   
+        /* To create a new variable named "endpoint" of type "Uri", 
+           using the "topicEndpoint" string constant as a constructor parameter */
+        Uri endpoint = new Uri(topicEndpoint);
+
+        /* To create a new variable named "credential" of type "AzureKeyCredential",
+           use the "topicKey" string constant as a constructor parameter. */
+        AzureKeyCredential credential = new AzureKeyCredential(topicKey);
+
+        /* To create a new variable named "client" of type "EventGridPublisherClient", 
+           using the "endpoint" and "credential" variables as constructor parameters */
+        EventGridPublisherClient client = new EventGridPublisherClient(endpoint, credential);
+
+        /* To create a new variable named "firstEvent" of type "EventGridEvent",
+           and populate that variable with sample data */        
+        EventGridEvent firstEvent = new EventGridEvent(
+            subject: $"New Employee: Alba Sutton",
+            eventType: "Employees.Registration.New",
+            dataVersion: "1.0",
+            data: new
+            {
+                FullName = "Alba Sutton",
+                Address = "4567 Pine Avenue, Edison, WA 97202"
+            }
+        );
+
+        /* To create a new variable named "secondEvent" of type "EventGridEvent",
+           and populate that variable with sample data */
+        EventGridEvent secondEvent = new EventGridEvent(
+            subject: $"New Employee: Alexandre Doyon",
+            eventType: "Employees.Registration.New",
+            dataVersion: "1.0",
+            data: new
+            {
+                FullName = "Alexandre Doyon",
+                Address = "456 College Street, Bow, WA 98107"
+            }
+        );
+
+        /* To asynchronously invoke the "EventGridPublisherClient.SendEventAsync"
+           method using the "firstEvent" variable as a parameter */
+        await client.SendEventAsync(firstEvent);
+        Console.WriteLine("First event published");
+
+        /* To asynchronously invoke the "EventGridPublisherClient.SendEventAsync"
+           method using the "secondEvent" variable as a parameter */
+        await client.SendEventAsync(secondEvent);
+        Console.WriteLine("Second event published");
+    }
+    ```
+    > **Note**: To know more about **[AzureKeyCredential](https://docs.microsoft.com/dotnet/api/azure.azurekeycredential)**
+  
+    > **Note**: To know more about Event Grid, click the following links: 
+    - **[EventGridPublisherClient](https://learn.microsoft.com/dotnet/api/azure.messaging.eventgrid.eventgridpublisherclient)**
+    
+    - **[EventGridEvent](https://learn.microsoft.com/dotnet/api/azure.messaging.eventgrid.eventgridevent)**
+
+    - **[EventGridPublisherClient.SendEventAsync](https://learn.microsoft.com/dotnet/api/azure.messaging.eventgrid.eventgridpublisherclient.sendeventasync)**
+
+
+1. Save the **Program.cs** file.
+
+1. In the **Visual Studio Code** window, on the Menu Bar, select **Terminal** and then select **New Terminal**.
+
+1. Run the following command to run the .NET web application:
+
+    ```powershell
+    dotnet run
+    ```
+
+    > **Note**: If there are any build errors, review the **Program.cs** file in the **Allfiles (F):\\Allfiles\\Labs\\09\\Solution\\EventPublisher** folder.
+
+1. Observe the success message output from the currently running console application.
+
+1. Select **Kill Terminal** or the **Recycle Bin** icon to close the currently open terminal and any associated processes.
+
+#### Task 4: Observe published events
+
+1. Return to the browser window with the **Azure Event Grid Viewer** web application.
+
+1. Review the **Employees.Registration.New** events that were created by your console application.
+
+1. Select any of the events and review its JSON content.
+
+1. Return to the Azure portal.
+
+#### Review
+
+In this exercise, you published new events to your Event Grid topic by using a .NET console application.
