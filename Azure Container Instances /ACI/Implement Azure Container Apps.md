@@ -1,7 +1,7 @@
 ---
 lab:
     title: 'Lab: Implement Azure Container Apps'
-    module: 'Administer PaaS Compute Options'
+    module: 'Azure Container Instances'
 ---
 
 # Lab - Implement Azure Container Apps
