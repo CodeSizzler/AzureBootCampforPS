@@ -1,10 +1,10 @@
 ---
 lab:
-    title: 'Lab 09b: Implement Azure Container Instances'
+    title: 'Lab: Implement Azure Container Instances'
     module: 'Azure Container Instances'
 ---
 
-# Lab 09b - Implement Azure Container Instances
+# Lab - Implement Azure Container Instances
 
 ## Lab introduction
 
