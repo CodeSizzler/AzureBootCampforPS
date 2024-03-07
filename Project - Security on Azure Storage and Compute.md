@@ -4,7 +4,7 @@ lab:
     module: 'Security on Azure Storage and Compute'
 ---
 
-# Lab 06: Service Endpoints and Securing Storage
+# Lab: Service Endpoints and Securing Storage
 # Student lab manual
 
 ## Lab scenario
